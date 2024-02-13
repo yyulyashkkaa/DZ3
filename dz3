@@ -1,0 +1,54 @@
+def str_to_tree(st):
+    return [int(x.strip()) if x else None for x in st.split(',')]
+
+
+def find_path(tree, target_sum, current_index=0):
+    n = len(tree)
+    if current_index >= n:
+        return False, None
+
+    current = tree[current_index]
+
+    left_child_index = 2 * current_index + 1
+    right_child_index = 2 * current_index + 2
+
+    left_child = tree[left_child_index] if left_child_index < n else None
+    right_child = tree[right_child_index] if right_child_index < n else None
+
+    if left_child is right_child is None:
+        return target_sum == current, current_index
+
+    has_path_left, left_leaf = find_path(tree, target_sum - current, left_child_index)
+    if has_path_left:
+        return has_path_left, left_leaf
+
+    return find_path(tree, target_sum - current, right_child_index)
+
+
+def get_path(tree, leaf_index):
+    vals = []
+
+    while True:
+        if not leaf_index:
+            vals.append(tree[leaf_index])
+            break
+
+        vals.append(tree[leaf_index])
+        leaf_index = (leaf_index - 1) // 2
+
+    return "->".join(reversed([str(x) for x in vals]))
+
+
+def main():
+    tree = str_to_tree(input())
+    target_sum = int(input())
+
+    has_path, leaf_index = find_path(tree, target_sum)
+    if has_path:
+        print(get_path(tree, leaf_index))
+    else:
+        print("Такого пути нет")
+
+
+if __name__ == '__main__':
+    main()
